@@ -14,6 +14,17 @@ namespace ServerLoads.Controllers
 {
     public class ServerLoadsController : ApiController
     {
+        DateTime _cutTime;
+        public DateTime CutTime { get { return _cutTime; } }
+        public ServerLoadsController()
+        {
+            _cutTime = DateTime.Now;
+        }
+
+        public ServerLoadsController(DateTime time)
+        {
+            _cutTime = time;
+        }
 
         [HttpPost]
         [Route("load")]
@@ -32,52 +43,69 @@ namespace ServerLoads.Controllers
 
         [HttpGet]
         [Route("averageload")]
-        public IHttpActionResult LoadAverages(BreakDownType ByHourMinute)
+        public IHttpActionResult LoadAverages(BreakDownType ByHourMinute, string ServerName)
         {
-            DateTime currTime = DateTime.Now;
+            DateTime currTime = CutTime;
 
-            //test data, please ignore!!
-            //DataPointsStore.Store.Enqueue(new DataPoint { CPU = 12.4, RAM = 55.2, Time = new DateTime(2016, 8, 29, 17, 30, 42) });
-            //DataPointsStore.Store.Enqueue(new DataPoint { CPU = 22.8, RAM = 11.4, Time = new DateTime(2016, 8, 29, 17, 30, 52) });
-            //DataPointsStore.Store.Enqueue(new DataPoint { CPU = 11.8, RAM = 17.4, Time = new DateTime(2016, 8, 29, 17, 42, 52) });
-
+            if (string.IsNullOrEmpty(ServerName))
+            {
+                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent("ServerName is Empty"),
+                    ReasonPhrase = "ServerName Required"
+                });
+            }
+            AverageLoads computedLoads = null;
             if (ByHourMinute == BreakDownType.ByMinute)
             {
                 DateTime endTime1 = DateTime.Parse(currTime.ToString("g")); //general date short time(without second part, like '8/29/2016 5:33PM')
                 DateTime startTime1 = endTime1.AddMinutes(-60);
-                var minutesLoad = DataPointsStore.Store.Where(dp => dp.Time < endTime1 && dp.Time >= startTime1)
+                computedLoads = new AverageLoads
+                {
+                    ServerName = ServerName,
+                    LoadType = BreakDownType.ByMinute,
+                    Loads = DataPointsStore.Store.Where(dp => dp.ServerName == ServerName && dp.Time < endTime1 && dp.Time >= startTime1)
                                     .GroupBy(dp => dp.Time.Minute)
-                                    .Select(grp => new
+                                    .Select(grp => new LoadDetail
                                     {
                                         Time = grp.First().Time.ToString("g"),   //become 8/29/2016 5:33 PM
                                         CPULoad = (grp.Sum(dp => dp.CPU) / grp.Count()).ToString("#.##"),
                                         RAMLoad = (grp.Sum(dp => dp.RAM) / grp.Count()).ToString("#.##")
-                                    });
-                return ResponseMessage(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new ObjectContent(minutesLoad.GetType(), minutesLoad, new JsonMediaTypeFormatter())
-                });
+                                    })
+                };
             }
-            else if (ByHourMinute == BreakDownType.ByHour)
+            else if(ByHourMinute == BreakDownType.ByHour)
             {
                 DateTime endTime2 = DateTime.Parse(currTime.ToString("d") + " " + currTime.ToString("hh:00:00 tt"));
                 DateTime startTime2 = endTime2.AddHours(-24);
-                var hoursLoad = DataPointsStore.Store.Where(dp => dp.Time < endTime2 && dp.Time >= startTime2)
+                computedLoads = new AverageLoads
+                {
+                    ServerName = ServerName,
+                    LoadType = BreakDownType.ByHour,
+                    Loads = DataPointsStore.Store.Where(dp => dp.ServerName == ServerName && dp.Time < endTime2 && dp.Time >= startTime2)
                                 .GroupBy(dp => dp.Time.Hour)
-                                .Select(grp => new
+                                .Select(grp => new LoadDetail
                                 {
                                     Time = grp.First().Time.ToString("d") + " " + grp.First().Time.Hour + ":00h",
                                     CPULoad = (grp.Sum(dp => dp.CPU) / grp.Count()).ToString("#.##"),
                                     RAMLoad = (grp.Sum(dp => dp.RAM) / grp.Count()).ToString("#.##")
+                                })
+                };
 
-                                });
+            }
+
+            if(computedLoads.Loads.Count() == 0)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "server targed not found"));
+            }
+            else 
+            {
                 return ResponseMessage(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new ObjectContent(hoursLoad.GetType(), hoursLoad, new JsonMediaTypeFormatter())
+                    Content = new ObjectContent(computedLoads.GetType(), computedLoads, new JsonMediaTypeFormatter())
                 });
             }
 
-            return StatusCode(HttpStatusCode.BadRequest);
         }
 
     }

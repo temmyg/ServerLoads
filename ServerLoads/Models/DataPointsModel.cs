@@ -34,4 +34,17 @@ namespace ServerLoads.Models
         ByMinute,
         ByHour
     }
+
+    public class AverageLoads
+    {
+        public string ServerName { get; set; }
+        public BreakDownType LoadType { get; set; }
+        public IEnumerable<LoadDetail> Loads { get; set; }
+    }
+
+    public class LoadDetail{
+        public string Time {get; set;}
+        public string CPULoad {get; set;}
+        public string RAMLoad {get; set; }
+    }
 }
