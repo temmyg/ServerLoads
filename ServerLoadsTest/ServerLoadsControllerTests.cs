@@ -86,7 +86,7 @@ namespace ServerLoads.Test
             //concurrently load data points
             for (int i = 0; i < 4; i++)
             {
-                int idx = i + 1;
+                int idx = i + 1; 
                 dpLoader.Add(Task.Run(() => _controller.StoreLoad(new DataPoint()
                 {
                     ServerName = "Srvr_Concurrent" + string.Format("{0:00}", idx),
