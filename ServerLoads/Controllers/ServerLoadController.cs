@@ -85,11 +85,14 @@ namespace ServerLoads.Controllers
                     LoadType = BreakDownType.ByHour,
                     Loads = DataPointsStore.Store.Where(dp => dp.ServerName == ServerName && dp.Time < endTime2 && dp.Time >= startTime2)
                                 .GroupBy(dp => dp.Time.Hour)
-                                .Select(grp => new LoadDetail
+                                .Select(grp =>
+                                {
+                                    return new LoadDetail
                                 {
                                     Time = grp.First().Time.ToString("d") + " " + grp.First().Time.Hour + ":00h",
                                     CPULoad = (grp.Sum(dp => dp.CPU) / grp.Count()).ToString("#.##"),
                                     RAMLoad = (grp.Sum(dp => dp.RAM) / grp.Count()).ToString("#.##")
+                                };
                                 })
                 };
 

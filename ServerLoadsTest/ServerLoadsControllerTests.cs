@@ -21,6 +21,7 @@ namespace ServerLoads.Test
         public static void PopulateStore(TestContext tc) {
             DataPointsStore.Store.Enqueue(new DataPoint { ServerName = "Srvr01", CPU = 12.4, RAM = 55.8, Time = new DateTime(2016, 8, 29, 17, 30, 42) });
             DataPointsStore.Store.Enqueue(new DataPoint { ServerName = "Srvr01", CPU = 22.8, RAM = 11.4, Time = new DateTime(2016, 8, 29, 17, 30, 52) });
+            DataPointsStore.Store.Enqueue(new DataPoint { ServerName = "Srvr01", CPU = 24.6, RAM = 17.2, Time = new DateTime(2016, 8, 29, 17, 23, 12) });
             DataPointsStore.Store.Enqueue(new DataPoint { ServerName = "Srvr01", CPU = 11.6, RAM = 17.4, Time = new DateTime(2016, 8, 29, 15, 42, 52) });
             DataPointsStore.Store.Enqueue(new DataPoint { ServerName = "Srvr02", CPU = 34, RAM = 11, Time = new DateTime(2016, 8, 29, 17, 35, 12) });
         }
@@ -79,7 +80,7 @@ namespace ServerLoads.Test
 
         [TestMethod]
         public void Test_StoreLoad_Concurrency()
-        {
+        {   
             Random rndGen = new Random();
             List<Task> dpLoader = new List<Task>();
             //concurrently load data points
@@ -88,7 +89,7 @@ namespace ServerLoads.Test
                 int idx = i + 1;
                 dpLoader.Add(Task.Run(() => _controller.StoreLoad(new DataPoint()
                 {
-                    ServerName = "Srvr" + string.Format("{0:00}", idx),
+                    ServerName = "Srvr_Concurrent" + string.Format("{0:00}", idx),
                     CPU = rndGen.Next(0, 100),
                     RAM = rndGen.Next(0, 100)
                 })));
@@ -96,12 +97,12 @@ namespace ServerLoads.Test
 
             Task.WaitAll(dpLoader.ToArray());
 
-            Assert.AreEqual(4, DataPointsStore.Store.Count());
+            Assert.AreEqual(4, DataPointsStore.Store.Where(dp=>dp.ServerName.IndexOf("Concurrent")!=-1).Count());
 
             for (int i = 0; i < 4; i++)
             {
                 Assert.IsTrue(DataPointsStore.Store
-                    .Where(dp => dp.ServerName == "Srvr" + string.Format("{0:00}", i + 1))
+                    .Where(dp => dp.ServerName == "Srvr_Concurrent" + string.Format("{0:00}", i + 1))
                     .Count() == 1);
             }
         }
@@ -180,8 +181,8 @@ namespace ServerLoads.Test
 
             //average at 17:00
             LoadDetail hourLoad = loadObj.Loads.First(hrload => hrload.Time == "8/29/2016 17:00h");
-            Assert.AreEqual(((12.4 + 22.8) / 2).ToString("#.##"), hourLoad.CPULoad);
-            Assert.AreEqual(((55.8 + 11.4) / 2).ToString("#.##"), hourLoad.RAMLoad);
+            Assert.AreEqual(((12.4 + 22.8 + 24.6) / 3).ToString("#.##"), hourLoad.CPULoad);
+            Assert.AreEqual(((55.8 + 11.4 + 17.2) / 3).ToString("#.##"), hourLoad.RAMLoad);
 
             //average at 15:00
             hourLoad = loadObj.Loads.First(hrload => hrload.Time == "8/29/2016 15:00h");
