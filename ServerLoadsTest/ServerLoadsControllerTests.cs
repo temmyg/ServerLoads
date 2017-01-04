@@ -14,7 +14,7 @@ using System.Windows.Forms;
 namespace ServerLoads.Test
 {
     [TestClass]
-    public class ServerLoadsControllerTests  //I made changes
+    public class ServerLoadsControllerTests  //I try to change from TestServerLoads
     {
         ServerLoadsController _controller;
         [ClassInitialize]
