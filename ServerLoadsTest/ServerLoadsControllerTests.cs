@@ -14,7 +14,7 @@ using System.Windows.Forms;
 namespace ServerLoads.Test
 {
     [TestClass]
-    public class ServerLoadsControllerTests  //From explore-conflicts 8th time
+    public class ServerLoadsControllerTests  //From master 10th time
     {
         ServerLoadsController _controller;
         [ClassInitialize]
