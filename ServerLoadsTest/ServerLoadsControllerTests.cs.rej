@@ -1,0 +1,11 @@
+diff a/ServerLoadsTest/ServerLoadsControllerTests.cs b/ServerLoadsTest/ServerLoadsControllerTests.cs	(rejected hunks)
+@@ -14,7 +14,8 @@
+ namespace ServerLoads.Test
+ {
+     [TestClass]
+-    public class ServerLoadsControllerTests  //From explore-conflicts 5th time, added 6th time
++
++    public class ServerLoadsControllerTests  //From explore-conflicts 7th time
+     {
+         ServerLoadsController _controller;
+         [ClassInitialize]
