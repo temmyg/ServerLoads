@@ -14,8 +14,9 @@ using System.Windows.Forms;
 namespace ServerLoads.Test
 {   
     //ge made changes in original B-branch
+    //vincekel 2nd change in BthBranch 
     [TestClass]
-    public class ServerLoadsControllerTests  //From BthBranch 1st time
+    public class ServerLoadsControllerTests  
     {
         ServerLoadsController _controller;
         [ClassInitialize]
