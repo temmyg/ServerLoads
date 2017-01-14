@@ -14,7 +14,7 @@ using System.Windows.Forms;
 namespace ServerLoads.Test
 {
     [TestClass]
-    public class ServerLoadsControllerTests  //From 10thBranch 1st time
+    public class ServerLoadsControllerTests  //From BthBranch 1st time
     {
         ServerLoadsController _controller;
         [ClassInitialize]
