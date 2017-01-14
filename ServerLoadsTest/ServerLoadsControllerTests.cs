@@ -13,8 +13,9 @@ using System.Windows.Forms;
 
 namespace ServerLoads.Test
 {
+    //vincekel first change in BthBranch 
     [TestClass]
-    public class ServerLoadsControllerTests  //From BthBranch 1st time
+    public class ServerLoadsControllerTests  
     {
         ServerLoadsController _controller;
         [ClassInitialize]
