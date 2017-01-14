@@ -12,9 +12,11 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace ServerLoads.Test
-{
+{   
+    //ge 2nd
+    //vincekel 3rd change in BthBranch 
     [TestClass]
-    public class ServerLoadsControllerTests  //From master 10th time
+    public class ServerLoadsControllerTests  
     {
         ServerLoadsController _controller;
         [ClassInitialize]
