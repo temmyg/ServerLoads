@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace ServerLoads.Test
 {
-    //vincekel first change in BthBranch 
+    //vincekel 2nd change in BthBranch 
     [TestClass]
     public class ServerLoadsControllerTests  
     {
